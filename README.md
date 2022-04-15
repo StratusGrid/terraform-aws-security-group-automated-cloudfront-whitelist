@@ -13,3 +13,8 @@ module "cloudfront-security-groups" {
     vpc_id               = "vpc-a30725da"
 }
 ```
+
+If you're using a mac, make sure you have the following package installed:
+```
+brew install md5sha1sum
+```
