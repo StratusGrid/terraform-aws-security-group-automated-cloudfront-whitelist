@@ -5,7 +5,7 @@ output "cloudwatch_log_group" {
 
 output "cloudfront_security_groups" {
   description = "Security groups created to allow ingress traffic from all Amazon CloudFront IP address ranges."
-  value       = concat(
+  value = concat(
     values(aws_security_group.allow_cloudfront_global_ips)[*],
     values(aws_security_group.allow_cloudfront_regional_ips)[*]
   )
@@ -13,7 +13,7 @@ output "cloudfront_security_groups" {
 
 output "cloudfront_security_groups_by_protocol" {
   description = "Security groups created to allow ingress traffic from all Amazon CloudFront IP address ranges. Grouped by protocol."
-  value       = {
+  value = {
     for protocol in var.permitted_protocols : protocol => [
       values(aws_security_group.allow_cloudfront_global_ips[protocol]),
       values(aws_security_group.allow_cloudfront_regional_ips[protocol])

@@ -1,23 +1,24 @@
 resource "aws_iam_role" "update_ec2_sg_ingress_rules" {
-  assume_role_policy  = jsonencode({
+  assume_role_policy = jsonencode({
     "Version" = "2012-10-17",
     "Statement" = [{
-      "Effect"    = "Allow",
-      "Action"    = "sts:AssumeRole",
+      "Effect" = "Allow",
+      "Action" = "sts:AssumeRole",
       "Principal" = {
         "Service" = "lambda.amazonaws.com"
       },
-      "Sid"       = ""
+      "Sid" = ""
     }]
   })
 
-  name  = "${var.lambda_function_name}-role"
-  tags  = var.input_tags
+  name = "${var.lambda_function_name}-role"
+  tags = var.input_tags
 }
 
+#tfsec:ignore:aws-iam-no-policy-wildcards Ignoring as this is a false positive, we are not using wildcard for all resources.
 resource "aws_iam_policy" "allow_cloudwatch_logging" {
-  policy      = jsonencode({
-    "Version"   = "2012-10-17",
+  policy = jsonencode({
+    "Version" = "2012-10-17",
     "Statement" = [{
       "Effect" = "Allow",
       "Action" = [
@@ -26,7 +27,7 @@ resource "aws_iam_policy" "allow_cloudwatch_logging" {
         "logs:PutLogEvents"
       ],
       "Resource" = [
-        "${aws_cloudwatch_log_group.update_security_groups_lambda_log.arn}",
+        aws_cloudwatch_log_group.update_security_groups_lambda_log.arn,
         "${aws_cloudwatch_log_group.update_security_groups_lambda_log.arn}:log-stream:*"
       ]
     }]
@@ -38,8 +39,8 @@ resource "aws_iam_policy" "allow_cloudwatch_logging" {
 }
 
 resource "aws_iam_policy" "allow_security_group_describe" {
-  policy      = jsonencode({
-    "Version"   = "2012-10-17",
+  policy = jsonencode({
+    "Version" = "2012-10-17",
     "Statement" = [{
       "Effect"   = "Allow",
       "Action"   = "ec2:DescribeSecurityGroups",
@@ -74,16 +75,16 @@ resource "aws_iam_policy" "allow_security_group_ingress_rules_update" {
 }
 
 resource "aws_iam_role_policy_attachment" "allow_logging" {
-  policy_arn  = aws_iam_policy.allow_cloudwatch_logging.arn
-  role        = aws_iam_role.update_ec2_sg_ingress_rules.name
+  policy_arn = aws_iam_policy.allow_cloudwatch_logging.arn
+  role       = aws_iam_role.update_ec2_sg_ingress_rules.name
 }
 
 resource "aws_iam_role_policy_attachment" "describe_ec2_security_group" {
-  policy_arn  = aws_iam_policy.allow_security_group_describe.arn
-  role        = aws_iam_role.update_ec2_sg_ingress_rules.name
+  policy_arn = aws_iam_policy.allow_security_group_describe.arn
+  role       = aws_iam_role.update_ec2_sg_ingress_rules.name
 }
 
 resource "aws_iam_role_policy_attachment" "allow_ingress_rule_update" {
-  policy_arn  = aws_iam_policy.allow_security_group_ingress_rules_update.arn
-  role        = aws_iam_role.update_ec2_sg_ingress_rules.name
+  policy_arn = aws_iam_policy.allow_security_group_ingress_rules_update.arn
+  role       = aws_iam_role.update_ec2_sg_ingress_rules.name
 }
